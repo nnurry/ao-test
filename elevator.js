@@ -17,31 +17,25 @@ class Elevator {
         this.moveTime = moveTime;
     }
 
-    cost(seg1, seg2, seg3, upFirst = true) {
-        let moveCost = 0;
-        if (upFirst) {
-            // move to top
-            hi = seg1[seg1.length - 1]
-            moveCost += (hi - this.curr) * this.moveTime;
-            // move to bottom
-            lo = seg2[seg2.length - 1];
-            moveCost += (hi - lo) * this.moveTime;
-            // move to immediates
-            mid = seg3[seg3.length - 1];
-            moveCost += (mid - lo) * this.moveTime;
-        } else {
-            // move to bottom
-            lo = seg1[seg1.length - 1];
-            moveCost += (this.curr - lo) * this.moveTime;
-            // move to top
-            hi = seg2[seg2.length - 1];
-            moveCost += (hi - lo) * this.moveTime;
-            // move to immediates
-            mid = seg3[seg3.length - 1];
-            moveCost += (mid - lo) * this.moveTime;
+    cost(upFirst = true, ...segments) {
+        let currentFloor = this.curr;
+
+        let moveTime = 0;
+        let waitTime = 0;
+
+        const order = upFirst ? [0, 1, 2] : [2, 1, 0];
+        for (const idx of order) {
+            const segment = segments[idx];
+            if (segment && segment.length > 0) {
+                const targetFloor = segment[segment.length - 1].floor;
+                const segmentMoveTime = Math.abs(targetFloor - currentFloor) * this.moveTime;
+                const segmentWaitTime = segment.length * this.waitTime;
+                moveTime += segmentMoveTime;
+                waitTime += segmentWaitTime;
+                currentFloor = targetFloor;
+            }
         }
-        waitCost = (seg1.length + seg2.length + seg3.length) * this.waitTime;
-        return moveCost + waitCost;
+        return moveTime + waitTime;
     }
 
     call(floor, dir) {
@@ -75,7 +69,7 @@ class Elevator {
             }
             return [downs, ups, []];
         }
-        const isDuplicated = this.requests.find((req) =>
+        const isDuplicated = this.requests.some((req) =>
             req.floor === floor
             && req.direction === dir
         );
@@ -102,7 +96,7 @@ class Elevator {
                 // find optimal trip (down first or up first)
                 const segmentedUpMoves = this.up(upRequests, downRequests);
                 const segmentedDownMoves = this.down(upRequests, downRequests);
-                let chooseUp = this.cost(...segmentedUpMoves, true) < this.cost(...segmentedDownMoves, false);
+                let chooseUp = this.cost(true, ...segmentedUpMoves) < this.cost(false, ...segmentedDownMoves);
                 this.requests = chooseUp ? segmentedUpMoves.flat() : segmentedDownMoves.flat();
             }
         }
