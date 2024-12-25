@@ -53,19 +53,32 @@ const App = () => {
 
             for (let j = 0; j < numElevators; j++) {
                 const isElevatorHere = elevatorStates[j].currentFloor === i;
-                const upRequestsOnFloor = elevatorStates[j].requests.filter(req => req.floor === i && req.dir === "up");
-                const downRequestsOnFloor = elevatorStates[j].requests.filter(req => req.floor === i && req.dir === "down");
+                const hasOppositePassenger = elevatorStates[j].requests.some(
+                    req => req.floor === i && req.dir !== elevatorStates[j].direction
+                );
+                const upRequestsOnFloor = elevatorStates[j].requests.filter(
+                    req => req.floor === i && req.dir === "up"
+                );
+                const downRequestsOnFloor = elevatorStates[j].requests.filter(
+                    req => req.floor === i && req.dir === "down"
+                );
 
                 floorElevators.push(
                     <div key={j} className="elevator-container">
-                        <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''}`}></div>
+                        <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''}`}>...</div>
                         <div className="call-buttons">
-                            <button onClick={() => callElevator(j + 1, i, "up")}
-                                disabled={elevatorStates[j].direction === "down" && elevatorStates[j].currentFloor !== i}
-                                className={`call-button ${upRequestsOnFloor.length > 0 ? 'active-call-up' : ''}`}>▲</button>
-                            <button onClick={() => callElevator(j + 1, i, "down")}
-                                disabled={elevatorStates[j].direction === "up" && elevatorStates[j].currentFloor !== i}
-                                className={`call-button ${downRequestsOnFloor.length > 0 ? 'active-call-down' : ''}`}>▼</button>
+                            <button
+                                onClick={() => callElevator(j + 1, i, "up")}
+                                disabled={hasOppositePassenger} // Check for opposite passenger
+                                className={`call-button ${upRequestsOnFloor.length > 0 ? 'active-call-up' : ''}`}>
+                                ▲
+                            </button>
+                            <button
+                                onClick={() => callElevator(j + 1, i, "down")}
+                                disabled={hasOppositePassenger} // Check for opposite passenger
+                                className={`call-button ${downRequestsOnFloor.length > 0 ? 'active-call-down' : ''}`}>
+                                ▼
+                            </button>
                         </div>
                     </div>
                 );
