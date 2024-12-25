@@ -1,12 +1,24 @@
+body {
+  margin: 0;
+  /* Remove default body margins */
+  display: flex;
+  justify-content: center;
+  /* Horizontally center content */
+  align-items: center;
+  /* Vertically center content */
+  min-height: 100vh;
+  /* Ensure body takes up full viewport height */
+  background-color: #333;
+  /* Dark background */
+  color: #eee;
+  /* Light text */
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: sans-serif;
-  background-color: #333;
-  /* Dark background */
-  color: #eee;
-  /* Light text */
   padding: 20px;
 }
 
