@@ -1,0 +1,16 @@
+services:
+  frontend:
+    image: elevator-frontend
+    build:
+      context: frontend
+    ports:
+      - "3000:5173"
+    # command: npx vite --host
+
+  backend:
+    image: elevator-backend
+    build:
+      context: backend
+    ports:
+      - "5000:5000"
+    # command: node --watch -- index.js
