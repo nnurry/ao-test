@@ -94,7 +94,7 @@ class Scheduler {
     }
 
     call(elevator, floor, dir) {
-        console.log(`Call received: Floor ${floor}, Direction ${dir}`);
+        console.log(`Call received: Floor ${floor}, Direction ${dir}, Elevator ${elevator.id}`);
         const isDuplicated = elevator.requests.some((req) =>
             req.floor === floor && req.dir === dir
         );

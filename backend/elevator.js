@@ -5,28 +5,40 @@ const Direction = {
 };
 
 class Elevator {
-    // time = milisec
-    constructor(id, floors, waitTime = 2000, moveTime = 1000) {
+    constructor(id, floors, waitTime = 4000, moveTime = 500) {
         this.id = id;
         this.curr = 1;
-        this.dir = Direction.IDLE; // "up", "down", "idle"
+        this.dir = Direction.IDLE;
         this.requests = [];
         this.floors = floors;
         this.isOpen = false;
+        this.isMoving = false;
         this.waitTime = waitTime;
         this.moveTime = moveTime;
     }
 
-    move() {
+    reset() {
+        this.curr = 1;
+        this.dir = Direction.IDLE;
+        this.requests = [];
+        this.isOpen = false;
+        this.isMoving = false;
+    }
+
+    async move() {
+        if (this.isMoving || this.isOpen) return; // Prevent moving if already moving or doors are open
+
         if (this.requests.length === 0) {
-            this.dir = Direction.IDLE;
-            console.log(`Elevator ${this.id}: No requests. Setting direction to IDLE.`);
+            if (this.dir !== Direction.IDLE) {
+                console.log(`Elevator ${this.id}: No requests. Setting direction to IDLE.`);
+                this.dir = Direction.IDLE;
+            }
             return;
         }
 
-        const nextDest = this.requests[0];
-        console.log(`Elevator ${this.id}: Current floor: ${this.curr}. Next destination: ${nextDest.floor}. Direction: ${this.dir}`);
+        this.isMoving = true;
 
+        const nextDest = this.requests[0]; // Get the next destination
         if (this.curr < nextDest.floor) {
             this.dir = Direction.UP;
             this.curr++;
@@ -35,36 +47,44 @@ class Elevator {
             this.dir = Direction.DOWN;
             this.curr--;
             console.log(`Elevator ${this.id}: Moving DOWN to floor ${this.curr}.`);
-        }
-
-        if (this.curr === nextDest.floor) {
+        } else {
             console.log(`Elevator ${this.id}: Reached floor ${this.curr}. Opening doors.`);
-            this.open();
-            // Remove all requests for the current floor (important for same-floor opposite-direction requests)
+            await this.open();
+
+            // Remove all requests for the current floor
             this.requests = this.requests.filter(req => req.floor !== this.curr);
 
-            setTimeout(() => {
-                console.log(`Elevator ${this.id}: Doors closing.`);
-                this.close();
-                // After closing the door, check if there are more requests, if none, set direction to idle
-                if (this.requests.length === 0) {
-                    this.dir = Direction.IDLE;
-                    console.log(`Elevator ${this.id}: No remaining requests. Setting direction to IDLE.`);
-                } else {
-                    console.log(`Elevator ${this.id}: Remaining requests: ${JSON.stringify(this.requests)}`);
-                }
-            }, this.waitTime);
+            await this.delay(this.waitTime); // Simulate door open time
+            console.log(`Elevator ${this.id}: Doors closing.`);
+            await this.close();
+
+            if (this.requests.length === 0) {
+                this.dir = Direction.IDLE;
+                console.log(`Elevator ${this.id}: No remaining requests. Setting direction to IDLE.`);
+            }
         }
+
+        this.isMoving = false; // Mark as not moving to allow the next step
     }
 
     open() {
-        this.isOpen = true;
-        console.log(`Elevator ${this.id}: Doors opened.`);
+        return new Promise(resolve => {
+            this.isOpen = true;
+            console.log(`Elevator ${this.id}: Doors opened.`);
+            resolve();
+        });
     }
 
     close() {
-        this.isOpen = false;
-        console.log(`Elevator ${this.id}: Doors closed.`);
+        return new Promise(resolve => {
+            this.isOpen = false;
+            console.log(`Elevator ${this.id}: Doors closed.`);
+            resolve();
+        });
+    }
+
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
