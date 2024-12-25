@@ -1,7 +1,5 @@
-const { get } = require('http');
 const { Elevator, Direction } = require('./elevator');
 const { Scheduler } = require('./scheduler');
-const e = require('express');
 
 const elevators = {
     "1": new Elevator(1, 10),

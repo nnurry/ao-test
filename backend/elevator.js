@@ -6,7 +6,7 @@ const Direction = {
 
 class Elevator {
     // time = milisec
-    constructor(id, floors, waitTime = 2000, moveTime = 250) {
+    constructor(id, floors, waitTime = 2000, moveTime = 1000) {
         this.id = id;
         this.curr = 1;
         this.dir = Direction.IDLE; // "up", "down", "idle"
