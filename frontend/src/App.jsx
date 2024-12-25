@@ -27,7 +27,16 @@ const App = () => {
         return () => clearInterval(intervalId);
     }, []);
 
+    // const getFloorElevatorKey = (elevatorId, floor) => `${elevatorId}_${floor}`;
+
+    // const checkFloorElevatorKey = (floorElevatorKey) => (
+    //     requestedFloor?.[floorElevatorKey]
+    // );
+
     const callElevator = (elevatorId, floor, direction) => {
+        // const key = getFloorElevatorKey(elevatorId, floor);
+        // requestedFloor[key] = true;
+        // setRequestedFloor(requestedFloor);
         fetch(`${apiURL}/elevator/call`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -101,9 +110,23 @@ const App = () => {
             for (let j = 0; j < elevatorStates.length; j++) {
                 const elevator = elevatorStates[j];
                 const isElevatorHere = elevator.currentFloor === i;
+                // const floorElevatorKey = getFloorElevatorKey(j + 1, i);
+                // const isRequested = checkFloorElevatorKey(floorElevatorKey);
+                // if (isRequested && isElevatorHere) {
+                //     // requestedFloor[key] = false;
+                //     // for (const key in requestedFloor) {
+                //     //     if (key === floorElevatorKey) {
+                //     //         delete floorElevatorKey[key];
+                //     //         break;
+                //     //     }
+                //     // }
+                //     setRequestedFloor(requestedFloor);
+                // }
 
                 floorElevators.push(
-                    <div key={j} className="elevator-container">
+                    <div key={j} className={
+                        `elevator-container`}
+                    >
                         <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''} ${elevator.isOpen ? 'door-open' : ''}`}>
                             {getElevatorStatusStr(elevator)}
                         </div>
