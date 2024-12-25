@@ -5,7 +5,7 @@ const Direction = {
 };
 
 class Elevator {
-    constructor(id, floors, waitTime = 4000, moveTime = 500) {
+    constructor(id, floors, waitTime = 6000, moveTime = 500) {
         this.id = id;
         this.curr = 1;
         this.dir = Direction.IDLE;
@@ -15,6 +15,7 @@ class Elevator {
         this.isMoving = false;
         this.waitTime = waitTime;
         this.moveTime = moveTime;
+        this.abortController = new AbortController();
     }
 
     reset() {
@@ -23,6 +24,7 @@ class Elevator {
         this.requests = [];
         this.isOpen = false;
         this.isMoving = false;
+        this.abortController = new AbortController(); 
     }
 
     async move() {
@@ -49,15 +51,12 @@ class Elevator {
             console.log(`Elevator ${this.id}: Moving DOWN to floor ${this.curr}.`);
         } else {
             console.log(`Elevator ${this.id}: Reached floor ${this.curr}. Opening doors.`);
-            await this.open();
-
             // Remove all requests for the current floor
             this.requests = this.requests.filter(req => req.floor !== this.curr);
-
-            await this.delay(this.waitTime); // Simulate door open time
-            console.log(`Elevator ${this.id}: Doors closing.`);
+            
+            await this.open().catch(e => console.log(`Elevator ${this.id}:`, e));
             await this.close();
-
+            
             if (this.requests.length === 0) {
                 this.dir = Direction.IDLE;
                 console.log(`Elevator ${this.id}: No remaining requests. Setting direction to IDLE.`);
@@ -67,24 +66,31 @@ class Elevator {
         this.isMoving = false; // Mark as not moving to allow the next step
     }
 
-    open() {
-        return new Promise(resolve => {
+    async open() {
+        return new Promise((resolve, reject) => {
+            console.log(`Elevator ${this.id}: Doors opening.`);
+            const resolveTimeout = setTimeout(() => {
+                resolve();
+            }, this.waitTime);
+            const { signal } = this.abortController;
+            signal.addEventListener("abort", () => {
+                clearTimeout(resolveTimeout);
+                reject("Forced to close the door.");
+            });
             this.isOpen = true;
             console.log(`Elevator ${this.id}: Doors opened.`);
-            resolve();
         });
     }
-
-    close() {
+    
+    async close() {
         return new Promise(resolve => {
+            console.log(`Elevator ${this.id}: Doors closing.`);
             this.isOpen = false;
+            this.abortController.abort();
             console.log(`Elevator ${this.id}: Doors closed.`);
+            this.abortController = new AbortController();
             resolve();
         });
-    }
-
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 

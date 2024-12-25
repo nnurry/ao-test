@@ -55,6 +55,7 @@ const elevatorController = {
             currentFloor: elevator.curr,
             direction: elevator.dir,
             isMoving: elevator.isMoving,
+            isOpen: elevator.isOpen,
             requests: elevator.requests,
         }));
         res.json(result);
@@ -72,17 +73,18 @@ const elevatorController = {
             return res.status(400).json({ error: `Can't issue opening door at floor ${floor} for elevator ${elevatorId}` });
         }
         elevator.isOpen = true;
+        const openPromise = elevator.open();
 
         res.json({ message: `Elevator ${elevatorId} door opened`, elevatorState: elevator });
         // Does not affect the response
         // Only update internal state
-        await elevator.delay(elevator.waitTime);
+        await openPromise.catch(e => e);
         elevator.isOpen = false;
     },
 
     // Close Elevator Door
     async closeDoor(req, res) {
-        const { elevatorId } = req.body;
+        const { elevatorId, floor } = req.body;
 
         const elevator = elevators[elevatorId];
         if (!elevator.isOpen) {
@@ -91,8 +93,7 @@ const elevatorController = {
         if (elevator.curr !== floor) {
             return res.status(400).json({ error: `Can't issue closing door at floor ${floor} for elevator ${elevatorId}` });
         }
-
-        elevator.isOpen = false;
+        await elevator.close().catch(e => e);
 
         res.json({ message: `Elevator ${elevatorId} door closed`, elevatorState: elevator });
     },

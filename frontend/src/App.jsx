@@ -19,7 +19,6 @@ const App = () => {
                         requests: elevatorData.requests,
                         isOpen: elevatorData.isOpen // Assuming API provides door status
                     })));
-                    setNumElevators(data.length);
                 });
         };
 
@@ -83,6 +82,17 @@ const App = () => {
             });
     };
 
+    const getElevatorStatusStr = (elevator) => {
+        let symbol = "";
+        if (elevator.direction === "up") {
+            symbol = "⬆️";
+        } else if (elevator.direction === "down") {
+            symbol = "⬇️";
+        }
+
+        return elevator.currentFloor + " " + symbol;
+    }
+
     const renderFloors = () => {
         const floors = [];
         for (let i = 1; i <= numFloors; i++) {
@@ -95,17 +105,19 @@ const App = () => {
                 floorElevators.push(
                     <div key={j} className="elevator-container">
                         <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''} ${elevator.isOpen ? 'door-open' : ''}`}>
-                            {elevator.id}
+                            {getElevatorStatusStr(elevator)}
                         </div>
                         <div className="call-buttons">
-                            <button onClick={() => callElevator(elevator.id, i, "up")}>⬆️</button>
-                            <button onClick={() => callElevator(elevator.id, i, "down")}>⬇️</button>
+                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "up")}>⬆️</button>
+                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "down")}>⬇️</button>
                             <button
+                                className="call-button"
                                 onClick={() => openDoor(elevator.id, i)}
                                 disabled={elevator.isOpen || elevator.currentFloor !== i}>
                                 ⬅️➡️
                             </button>
                             <button
+                                className="call-button"
                                 onClick={() => closeDoor(elevator.id, i)}
                                 disabled={!elevator.isOpen || elevator.currentFloor !== i}>
                                 ➡️⬅️
