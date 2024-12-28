@@ -5,8 +5,8 @@ const configs = require("./configs");
 
 const elevatorConfigs = [
     [1, configs.Elevator.Standard.maxFloor, 1],
-    // [1, configs.Elevator.Standard.maxFloor, 1],
-    // [1, configs.Elevator.Standard.maxFloor, 1],
+    [2, configs.Elevator.Standard.maxFloor, 1],
+    [3, configs.Elevator.Standard.maxFloor, 1],
 ];
 
 const elevators = elevatorConfigs.map(cfg => new Elevator(...cfg));

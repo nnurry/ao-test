@@ -124,6 +124,9 @@ class Scheduler {
     }
 
     costFunction(elevator, floor, direction) {
+        if (elevator.currentFloor == floor) {
+            return 0;
+        }
         if (elevator.state == State.IDLE) {
             return Math.abs(elevator.currentFloor - floor);
         }
@@ -140,7 +143,8 @@ class Scheduler {
                 isDistantEnough = true;
             }
             if (isDistantEnough) {
-                return Math.abs(elevator.currentFloor - floor);
+                const currentLoad = elevator.requests[direction].length;
+                return Math.abs(elevator.currentFloor - floor) + currentLoad;
             }
         }
         // Too big cost
@@ -158,18 +162,18 @@ class Scheduler {
                 minCost = currentCost;
                 suitableElevator = elevator;
             }
-            if (elevator.requests < minRequests) {
-                minRequests = elevator.requests;
+            if (elevator.requests[direction] < minRequests) {
+                minRequests = elevator.requests[direction];
                 leastCrowdedElevator = elevator;
             }
         });
 
         if (suitableElevator) {
             console.log("Found suitable elevator:", suitableElevator.id);
-            suitableElevator.addRequest(floor);
+            suitableElevator.addRequest(floor, direction);
         } else {
             console.log("Found least crowded elevator:", leastCrowdedElevator.id);
-            leastCrowdedElevator.addRequest(floor);
+            leastCrowdedElevator.addRequest(floor, direction);
         }
     }
 

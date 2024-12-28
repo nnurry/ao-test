@@ -8,13 +8,15 @@ class Elevator {
         this.direction = Direction.IDLE;
         this.state = State.IDLE;
         this.isOpen = false;
-        this.requests = [];
+        this.requests = {};
+        this.requests[Direction.UP] = [];
+        this.requests[Direction.DOWN] = [];
         this.abortController = new AbortController();
     }
 
-    addRequest(floor) {
+    addRequest(floor, direction) {
         console.log(`Elevator ${this.id}: Added request to move to floor ${floor}`);
-        if (this.requests.includes(floor)) {
+        if (this.requests[direction].includes(floor)) {
             console.log(`Elevator ${this.id}: Duplicated request to move to floor ${floor}`);
             return false;
         }
@@ -22,15 +24,14 @@ class Elevator {
             console.log(`Elevator ${this.id}: Invalid floor ${floor}`);
             return false;
         }
-        this.requests.push(floor);
-        this.requests.sort((prev, next) => {
-            // Elevator going down => Sort the floor descendingly to pick up
-            // From top down, otherwise ascendingly
-            if (this.direction == Direction.DOWN) {
-                return next - prev;
-            }
-            return prev - next;
-        })
+        this.requests[direction].push(floor);
+        // Elevator going down => Sort the floor descendingly to pick up
+        // From top down, otherwise ascendingly
+        this.requests[direction].sort((prev, next) =>
+            this.direction == Direction.DOWN
+                ? (next - prev)
+                : (prev - next)
+        );
         return true;
     }
 
@@ -46,15 +47,28 @@ class Elevator {
     }
 
     async updateState(waitTime) {
-        if (!this.requests.length && this.state != State.LOADING) {
+        if (this.state == State.LOADING) {
+            return;
+        }
+        if (this.requests[Direction.UP].length + this.requests[Direction.DOWN].length <= 0) {
             this.direction = Direction.IDLE;
             this.state = State.IDLE;
             return;
         }
-        if (this.state == State.LOADING) {
+        let direction = this.direction;
+        if (this.state == State.IDLE || this.state == State.MOVING) {
+            if (this.requests[Direction.UP].length > 0) {                console.log("UP", this.requests[Direction.UP])
+                direction = Direction.UP;
+            } else if (this.requests[Direction.DOWN].length > 0){
+                direction = Direction.DOWN;
+            }
+        }
+        this.direction = direction;
+        if (direction == Direction.IDLE) {
+            // nothing changed -> both empty
             return;
         }
-        const nextFloor = this.requests[0];
+        const nextFloor = this.requests[direction][0];
         if (nextFloor > this.currentFloor) {
             console.log(`Elevator ${this.id}: Moving up to ${this.currentFloor + 1}`);
             this.direction = Direction.UP;
@@ -65,7 +79,7 @@ class Elevator {
             this.state = State.MOVING;
         } else {
             console.log(`Elevator ${this.id}: Arrived at ${nextFloor}`);
-            this.requests.shift();
+            this.requests[direction].shift();
             this.state = State.MOVING;
             await this.openDoor(waitTime).catch(e => console.log(`Elevator ${this.id}:`, e));
         }
