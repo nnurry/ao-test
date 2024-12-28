@@ -42,21 +42,6 @@ const App = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ elevatorId, floor, direction }),
         })
-            .then(res => res.json())
-            .then(data => {
-                setElevatorStates(prevStates =>
-                    prevStates.map(state =>
-                        state.id === elevatorId
-                            ? {
-                                ...state,
-                                currentFloor: data.elevatorState.curr,
-                                direction: data.elevatorState.dir,
-                                requests: data.elevatorState.requests
-                            }
-                            : state
-                    )
-                );
-            });
     };
 
     const openDoor = (elevatorId, floor) => {
@@ -110,18 +95,6 @@ const App = () => {
             for (let j = 0; j < elevatorStates.length; j++) {
                 const elevator = elevatorStates[j];
                 const isElevatorHere = elevator.currentFloor === i;
-                // const floorElevatorKey = getFloorElevatorKey(j + 1, i);
-                // const isRequested = checkFloorElevatorKey(floorElevatorKey);
-                // if (isRequested && isElevatorHere) {
-                //     // requestedFloor[key] = false;
-                //     // for (const key in requestedFloor) {
-                //     //     if (key === floorElevatorKey) {
-                //     //         delete floorElevatorKey[key];
-                //     //         break;
-                //     //     }
-                //     // }
-                //     setRequestedFloor(requestedFloor);
-                // }
 
                 floorElevators.push(
                     <div key={j} className={
