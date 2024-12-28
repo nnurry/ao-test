@@ -14,14 +14,14 @@ class Elevator {
         this.abortController = new AbortController();
     }
 
-    addRequest(floor, direction) {
+    addRequest(floor, direction = null) {
         console.log(`Elevator ${this.id}: Added request to move to floor ${floor}`);
-        if (this.requests[direction].includes(floor)) {
-            console.log(`Elevator ${this.id}: Duplicated request to move to floor ${floor}`);
-            return false;
-        }
         if ((floor < 1 || floor > this.totalFloors)) {
             console.log(`Elevator ${this.id}: Invalid floor ${floor}`);
+            return false;
+        }
+        if (this.requests[direction].includes(floor)) {
+            console.log(`Elevator ${this.id}: Duplicated request to move to floor ${floor}`);
             return false;
         }
         this.requests[direction].push(floor);
@@ -57,9 +57,9 @@ class Elevator {
         }
         let direction = this.direction;
         if (this.state == State.IDLE || this.state == State.MOVING) {
-            if (this.requests[Direction.UP].length > 0) {                console.log("UP", this.requests[Direction.UP])
+            if (this.requests[Direction.UP].length > 0) {
                 direction = Direction.UP;
-            } else if (this.requests[Direction.DOWN].length > 0){
+            } else if (this.requests[Direction.DOWN].length > 0) {
                 direction = Direction.DOWN;
             }
         }

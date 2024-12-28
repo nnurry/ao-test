@@ -151,8 +151,12 @@ class Scheduler {
         return Infinity;
     }
 
-    processRequest(floor, direction, elevatorId = null) {
+    processRequest(floor, direction = null, elevatorId = null) {
         if (elevatorId != null) {
+            if (direction == null) {
+                console.log(`Designate elevator ${elevatorId} to go to floor ${floor} with direction ${direction}`);
+                direction = floor > this.elevators[elevatorId] ? Direction.UP : Direction.DOWN;
+            }
             console.log(`Designate elevator ${elevatorId} to go to floor ${floor} with direction ${direction}`);
             this.elevators[elevatorId].addRequest(floor, direction);
             return;

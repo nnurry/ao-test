@@ -24,11 +24,7 @@ class ElevatorController {
     static handleCallRequest(req, res) {
         const { elevatorId, floor, direction } = req.body;
 
-        if (
-            typeof floor !== 'number' ||
-            floor <= 0 ||
-            ![Direction.UP, Direction.DOWN].includes(direction)
-        ) {
+        if (typeof floor !== 'number' || floor <= 0) {
             return res.status(400).json({ error: "Invalid request." });
         }
 

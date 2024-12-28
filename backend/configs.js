@@ -1,7 +1,7 @@
 const Elevator = {
     Standard: {
         waitTime: 6000,
-        moveTime: 1500,
+        moveTime: 2000,
         maxFloor: 10,
     }
 };

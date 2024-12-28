@@ -27,24 +27,15 @@ const App = () => {
         return () => clearInterval(intervalId);
     }, []);
 
-    // const getFloorElevatorKey = (elevatorId, floor) => `${elevatorId}_${floor}`;
-
-    // const checkFloorElevatorKey = (floorElevatorKey) => (
-    //     requestedFloor?.[floorElevatorKey]
-    // );
-
-    const callElevator = (elevatorId, floor, direction) => {
-        // const key = getFloorElevatorKey(elevatorId, floor);
-        // requestedFloor[key] = true;
-        // setRequestedFloor(requestedFloor);
+    const callElevator = (floor, direction = null, elevatorId = null) => {
         fetch(`${apiURL}/elevator/call`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ elevatorId, floor, direction }),
-        })
+        });
     };
 
-    const openDoor = (elevatorId, floor) => {
+    const openDoor = (floor, elevatorId) => {
         fetch(`${apiURL}/elevator/open`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -60,7 +51,7 @@ const App = () => {
             });
     };
 
-    const closeDoor = (elevatorId, floor) => {
+    const closeDoor = (floor, elevatorId) => {
         fetch(`${apiURL}/elevator/close`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -85,7 +76,7 @@ const App = () => {
         }
 
         return elevator.currentFloor + " " + symbol;
-    }
+    };
 
     const renderFloors = () => {
         const floors = [];
@@ -98,24 +89,39 @@ const App = () => {
                 const isElevatorHere = elevator.currentFloor === i;
 
                 floorElevators.push(
-                    <div key={elevatorId} className={
-                        `elevator-container`}
-                    >
-                        <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''} ${elevator.isOpen ? 'door-open' : ''}`}>
+                    <div key={elevatorId} className={`elevator-container`}>
+                        <div className={`elevator ${isElevatorHere ? "elevator-here" : ""} ${elevator.isOpen ? "door-open" : ""}`}>
                             {getElevatorStatusStr(elevator)}
                         </div>
                         <div className="call-buttons">
-                            <button className="call-button" onClick={() => callElevator(elevatorId, i, "up")}>⬆️</button>
-                            <button className="call-button" onClick={() => callElevator(elevatorId, i, "down")}>⬇️</button>
+                            {
+                                (
+                                    <div className="floor-selection">
+                                        {Array.from({ length: numFloors }, (_, index) => numFloors - index).map(floor => {
+                                            return (
+                                                <button
+                                                    key={floor}
+                                                    disabled={!isElevatorHere}
+                                                    className="call-button"
+                                                    onClick={() => callElevator(floor, null, elevatorId)}
+                                                >
+                                                    {floor}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            <button className="call-button" onClick={() => callElevator(i, "up", null)}>⬆️</button>
+                            <button className="call-button" onClick={() => callElevator(i, "down", null)}>⬇️</button>
                             <button
                                 className="call-button"
-                                onClick={() => openDoor(elevatorId, i)}
+                                onClick={() => openDoor(i, elevatorId)}
                                 disabled={elevator.isOpen || elevator.currentFloor !== i}>
                                 ⬅️➡️
                             </button>
                             <button
                                 className="call-button"
-                                onClick={() => closeDoor(elevatorId, i)}
+                                onClick={() => closeDoor(i, elevatorId)}
                                 disabled={!elevator.isOpen || elevator.currentFloor !== i}>
                                 ➡️⬅️
                             </button>
