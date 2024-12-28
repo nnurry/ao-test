@@ -21,8 +21,8 @@ scheduler.startElevators();
 
 class ElevatorController {
     // Call an elevator to a specific floor and direction
-    static handleCallRequest (req, res) {
-        const { floor, direction } = req.body;
+    static handleCallRequest(req, res) {
+        const { elevatorId, floor, direction } = req.body;
 
         if (
             typeof floor !== 'number' ||
@@ -32,14 +32,14 @@ class ElevatorController {
             return res.status(400).json({ error: "Invalid request." });
         }
 
-        scheduler.processRequest(parseInt(floor), direction);
+        scheduler.processRequest(parseInt(floor), direction, elevatorId);
         res.json({
             message: `Elevator called.`,
         });
     }
 
     // Get the current status for all elevators
-    static handleGetElevatorStatus (req, res) {
+    static handleGetElevatorStatus(req, res) {
         const result = scheduler.getStatus();
         res.json(result);
     }
