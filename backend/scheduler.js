@@ -153,9 +153,12 @@ class Scheduler {
 
     processRequest(floor, direction = null, elevatorId = null) {
         if (elevatorId != null) {
+            if (floor == this.elevators[elevatorId].currentFloor) {
+                console.log("Elevator is available on the same floor.")
+                return;
+            }
             if (direction == null) {
-                console.log(`Designate elevator ${elevatorId} to go to floor ${floor} with direction ${direction}`);
-                direction = floor > this.elevators[elevatorId] ? Direction.UP : Direction.DOWN;
+                direction = floor > this.elevators[elevatorId].currentFloor ? Direction.UP : Direction.DOWN;
             }
             console.log(`Designate elevator ${elevatorId} to go to floor ${floor} with direction ${direction}`);
             this.elevators[elevatorId].addRequest(floor, direction);
