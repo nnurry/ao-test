@@ -27,39 +27,15 @@ const App = () => {
         return () => clearInterval(intervalId);
     }, []);
 
-    // const getFloorElevatorKey = (elevatorId, floor) => `${elevatorId}_${floor}`;
-
-    // const checkFloorElevatorKey = (floorElevatorKey) => (
-    //     requestedFloor?.[floorElevatorKey]
-    // );
-
-    const callElevator = (elevatorId, floor, direction) => {
-        // const key = getFloorElevatorKey(elevatorId, floor);
-        // requestedFloor[key] = true;
-        // setRequestedFloor(requestedFloor);
+    const callElevator = (floor, direction = null, elevatorId = null) => {
         fetch(`${apiURL}/elevator/call`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ elevatorId, floor, direction }),
-        })
-            .then(res => res.json())
-            .then(data => {
-                setElevatorStates(prevStates =>
-                    prevStates.map(state =>
-                        state.id === elevatorId
-                            ? {
-                                ...state,
-                                currentFloor: data.elevatorState.curr,
-                                direction: data.elevatorState.dir,
-                                requests: data.elevatorState.requests
-                            }
-                            : state
-                    )
-                );
-            });
+        });
     };
 
-    const openDoor = (elevatorId, floor) => {
+    const openDoor = (floor, elevatorId) => {
         fetch(`${apiURL}/elevator/open`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -75,7 +51,7 @@ const App = () => {
             });
     };
 
-    const closeDoor = (elevatorId, floor) => {
+    const closeDoor = (floor, elevatorId) => {
         fetch(`${apiURL}/elevator/close`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -100,7 +76,7 @@ const App = () => {
         }
 
         return elevator.currentFloor + " " + symbol;
-    }
+    };
 
     const renderFloors = () => {
         const floors = [];
@@ -108,40 +84,44 @@ const App = () => {
             const floorElevators = [];
 
             for (let j = 0; j < elevatorStates.length; j++) {
-                const elevator = elevatorStates[j];
+                const elevatorId = j;
+                const elevator = elevatorStates[elevatorId];
                 const isElevatorHere = elevator.currentFloor === i;
-                // const floorElevatorKey = getFloorElevatorKey(j + 1, i);
-                // const isRequested = checkFloorElevatorKey(floorElevatorKey);
-                // if (isRequested && isElevatorHere) {
-                //     // requestedFloor[key] = false;
-                //     // for (const key in requestedFloor) {
-                //     //     if (key === floorElevatorKey) {
-                //     //         delete floorElevatorKey[key];
-                //     //         break;
-                //     //     }
-                //     // }
-                //     setRequestedFloor(requestedFloor);
-                // }
 
                 floorElevators.push(
-                    <div key={j} className={
-                        `elevator-container`}
-                    >
-                        <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''} ${elevator.isOpen ? 'door-open' : ''}`}>
+                    <div key={elevatorId} className={`elevator-container`}>
+                        <div className={`elevator ${isElevatorHere ? "elevator-here" : ""} ${elevator.isOpen ? "door-open" : ""}`}>
                             {getElevatorStatusStr(elevator)}
                         </div>
                         <div className="call-buttons">
-                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "up")}>⬆️</button>
-                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "down")}>⬇️</button>
+                            {
+                                (
+                                    <div className="floor-selection">
+                                        {Array.from({ length: numFloors }, (_, index) => numFloors - index).map(floor => {
+                                            return (
+                                                <button
+                                                    key={floor}
+                                                    disabled={!isElevatorHere}
+                                                    className="call-button"
+                                                    onClick={() => callElevator(floor, null, elevatorId)}
+                                                >
+                                                    {floor}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            <button className="call-button" onClick={() => callElevator(i, "up", null)}>⬆️</button>
+                            <button className="call-button" onClick={() => callElevator(i, "down", null)}>⬇️</button>
                             <button
                                 className="call-button"
-                                onClick={() => openDoor(elevator.id, i)}
+                                onClick={() => openDoor(i, elevatorId)}
                                 disabled={elevator.isOpen || elevator.currentFloor !== i}>
                                 ⬅️➡️
                             </button>
                             <button
                                 className="call-button"
-                                onClick={() => closeDoor(elevator.id, i)}
+                                onClick={() => closeDoor(i, elevatorId)}
                                 disabled={!elevator.isOpen || elevator.currentFloor !== i}>
                                 ➡️⬅️
                             </button>

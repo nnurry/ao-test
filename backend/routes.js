@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const elevatorController = require('./controllers');
+const ElevatorController = require('./controllers');
 
-router.post('/call', elevatorController.callElevator);
-router.get('/status/all', elevatorController.getAllElevatorStatus);
-router.get('/requests/all', elevatorController.getAllElevatorRequests);
-router.post('/open', elevatorController.openDoor);
-router.post('/close', elevatorController.closeDoor);
+router.post('/call', ElevatorController.handleCallRequest);
+router.get('/status/all', ElevatorController.handleGetElevatorStatus);
+router.post('/open', ElevatorController.handleOpenDoor);
+router.post('/close', ElevatorController.handleCloseDoor);
 
 module.exports = router;
