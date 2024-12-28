@@ -119,7 +119,7 @@ class Scheduler {
     startElevators() {
         // Start the elevator movement in background
         this.jobs = this.elevators.map(
-            elevator => setInterval(() => elevator.move(), this.moveTime)
+            elevator => setInterval(() => elevator.move(this.waitTime), this.moveTime)
         );
     }
 

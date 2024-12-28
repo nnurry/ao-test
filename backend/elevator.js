@@ -45,10 +45,13 @@ class Elevator {
         return isMoved;
     }
 
-    async updateState() {
-        if (!this.requests.length && !this.state != State.MOVING) {
+    async updateState(waitTime) {
+        if (!this.requests.length && this.state != State.LOADING) {
             this.direction = Direction.IDLE;
             this.state = State.IDLE;
+            return;
+        }
+        if (this.state == State.LOADING) {
             return;
         }
         const nextFloor = this.requests[0];
@@ -64,30 +67,31 @@ class Elevator {
             console.log(`Elevator ${this.id}: Arrived at ${nextFloor}`);
             this.requests.shift();
             this.state = State.MOVING;
-            await this.openDoor().catch(e => console.log(`Elevator ${this.id}:`, e));
+            await this.openDoor(waitTime).catch(e => console.log(`Elevator ${this.id}:`, e));
         }
     }
 
-    async move() {
+    async move(waitTime) {
         if (this.state == State.MOVING) {
             this.moveOneFloor();
         }
-        await this.updateState();
+        await this.updateState(waitTime);
     }
 
-    async openDoor() {
+    async openDoor(waitTime) {
         return new Promise((resolve, reject) => {
             console.log(`Elevator ${this.id}: Doors opening.`);
             const resolveTimeout = setTimeout(() => {
                 this.state = State.IDLE;
                 this.isOpen = false;
                 resolve();
-            }, this.waitTime);
+            }, waitTime);
             const { signal } = this.abortController;
             signal.addEventListener("abort", () => {
                 clearTimeout(resolveTimeout);
                 reject("Forced to close the door.");
             });
+            this.state = State.LOADING;
             this.isOpen = true;
             console.log(`Elevator ${this.id}: Doors opened.`);
         });

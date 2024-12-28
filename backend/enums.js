@@ -7,6 +7,7 @@ const ElevatorDirection = {
 const ElevatorState = {
     IDLE: "idle",
     MOVING: "moving",
+    LOADING: "loading",
 }
 
 module.exports = {

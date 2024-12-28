@@ -93,28 +93,29 @@ const App = () => {
             const floorElevators = [];
 
             for (let j = 0; j < elevatorStates.length; j++) {
-                const elevator = elevatorStates[j];
+                const elevatorId = j;
+                const elevator = elevatorStates[elevatorId];
                 const isElevatorHere = elevator.currentFloor === i;
 
                 floorElevators.push(
-                    <div key={j} className={
+                    <div key={elevatorId} className={
                         `elevator-container`}
                     >
                         <div className={`elevator ${isElevatorHere ? 'elevator-here' : ''} ${elevator.isOpen ? 'door-open' : ''}`}>
                             {getElevatorStatusStr(elevator)}
                         </div>
                         <div className="call-buttons">
-                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "up")}>⬆️</button>
-                            <button className="call-button" onClick={() => callElevator(elevator.id, i, "down")}>⬇️</button>
+                            <button className="call-button" onClick={() => callElevator(elevatorId, i, "up")}>⬆️</button>
+                            <button className="call-button" onClick={() => callElevator(elevatorId, i, "down")}>⬇️</button>
                             <button
                                 className="call-button"
-                                onClick={() => openDoor(elevator.id, i)}
+                                onClick={() => openDoor(elevatorId, i)}
                                 disabled={elevator.isOpen || elevator.currentFloor !== i}>
                                 ⬅️➡️
                             </button>
                             <button
                                 className="call-button"
-                                onClick={() => closeDoor(elevator.id, i)}
+                                onClick={() => closeDoor(elevatorId, i)}
                                 disabled={!elevator.isOpen || elevator.currentFloor !== i}>
                                 ➡️⬅️
                             </button>

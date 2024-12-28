@@ -49,14 +49,14 @@ class ElevatorController {
         const { elevatorId, floor } = req.body;
 
         const elevator = elevators[elevatorId];
-        if (elevator.isMoving) {
+        if (elevator.state == State.MOVING) {
             return res.status(400).json({ error: `Elevator ${elevatorId} is moving, can't open door` });
         }
-        if (elevator.curr !== floor) {
+        if (elevator.currentFloor !== floor) {
             return res.status(400).json({ error: `Can't issue opening door at floor ${floor} for elevator ${elevatorId}` });
         }
         elevator.isOpen = true;
-        const openPromise = elevator.openDoor();
+        const openPromise = elevator.openDoor(scheduler.waitTime);
 
         res.json({ message: `Elevator ${elevatorId} door opened`, elevatorState: elevator });
         // Does not affect the response
@@ -73,7 +73,7 @@ class ElevatorController {
         if (!elevator.isOpen) {
             return res.status(400).json({ error: "Door is already closed" });
         }
-        if (elevator.curr !== floor) {
+        if (elevator.currentFloor !== floor) {
             return res.status(400).json({ error: `Can't issue closing door at floor ${floor} for elevator ${elevatorId}` });
         }
         await elevator.closeDoor().catch(e => e);
