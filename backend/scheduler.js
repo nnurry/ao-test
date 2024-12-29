@@ -1,4 +1,4 @@
-const { ElevatorDirection: Direction, ElevatorState: State, ElevatorDirection } = require("./enums");
+const { ElevatorDirection: Direction, ElevatorState: State } = require("./enums");
 
 class Scheduler {
     constructor(elevators, waitTime, moveTime) {
@@ -33,11 +33,12 @@ class Scheduler {
             // can fetch when it is at least 2 floors away to compensate
             // for deceleration
             let isDistantEnough = false;
-            if (direction == Direction.UP && elevator.currentFloor + 1 < floor) {
+            const isGoingUp = direction == Direction.UP;
+            const minimumFloorDistance = elevator.state == State.MOVING ? 2 : 0;
+            if (isGoingUp && elevator.currentFloor + minimumFloorDistance <= floor) {
                 // i.e: 3 can fetch 5, but not 4
                 isDistantEnough = true;
-            }
-            if (direction == Direction.DOWN && elevator.currentFloor - 1 > floor) {
+            } else if (!isGoingUp && elevator.currentFloor - minimumFloorDistance >= floor) {
                 // i.e: 7 can fetch 5, but not 6
                 isDistantEnough = true;
             }
