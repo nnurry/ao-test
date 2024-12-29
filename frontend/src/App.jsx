@@ -78,6 +78,8 @@ const App = () => {
             symbol = "⬆️";
         } else if (elevator.direction === "down") {
             symbol = "⬇️";
+        } else if (elevator.isOpen) {
+            symbol = "!";
         }
 
         return elevator.currentFloor + " " + symbol;
