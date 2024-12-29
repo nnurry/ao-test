@@ -14,6 +14,15 @@ class Elevator {
         this.abortController = new AbortController();
     }
 
+    resetState() {
+        this.currentFloor = 1;
+        this.state = State.IDLE;
+        this.isOpen = false;
+        this.requests[Direction.UP] = [];
+        this.requests[Direction.DOWN] = [];
+        this.abortController = new AbortController();
+    }
+
     addRequest(floor, direction = null) {
         console.log(`Elevator ${this.id}: Added request to move to floor ${floor}`);
         if ((floor < 1 || floor > this.totalFloors)) {

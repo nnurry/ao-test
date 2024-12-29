@@ -68,6 +68,10 @@ const App = () => {
             });
     };
 
+    const resetElevatorSystem = () => {
+        fetch(`${apiURL}/elevator/reset`, { method: 'POST' });
+    };
+
     const getElevatorStatusStr = (elevator) => {
         let symbol = "";
         if (elevator.direction === "up") {
@@ -144,6 +148,7 @@ const App = () => {
     return (
         <div className="container">
             <h1>Elevator Simulator</h1>
+            <button className="reset-button" onClick={resetElevatorSystem}>Reset System</button>
             <div className="elevator-shaft">
                 {renderFloors()}
             </div>

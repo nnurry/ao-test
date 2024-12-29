@@ -20,6 +20,13 @@ const scheduler = new Scheduler(
 scheduler.startElevators();
 
 class ElevatorController {
+    static async handleResetRequest(req, res) {
+        scheduler.stopElevators();
+        scheduler.resetElevators();
+        scheduler.startElevators();
+        ElevatorController.handleGetElevatorStatus(req, res);
+    }
+
     // Call an elevator to a specific floor and direction
     static handleCallRequest(req, res) {
         const { elevatorId, floor, direction } = req.body;
