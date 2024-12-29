@@ -73,8 +73,8 @@ class Scheduler {
                 minCost = currentCost;
                 suitableElevator = elevator;
             }
-            if (elevator.requests[direction] < minRequests) {
-                minRequests = elevator.requests[direction];
+            if (elevator.requests[direction].length < minRequests) {
+                minRequests = elevator.requests[direction].length;
                 leastCrowdedElevator = elevator;
             }
         });
