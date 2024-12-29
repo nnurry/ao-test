@@ -5,6 +5,7 @@ const apiURL = "http://localhost:5000";
 
 const App = () => {
     const numFloors = 10; // Adjusted for 10 floors
+    const elevatorButtonOrders = [5, 10, 4, 9, 3, 8, 2, 7, 1, 6];
     const [elevatorStates, setElevatorStates] = useState([]);
 
     useEffect(() => {
@@ -93,11 +94,13 @@ const App = () => {
                         <div className={`elevator ${isElevatorHere ? "elevator-here" : ""} ${elevator.isOpen ? "door-open" : ""}`}>
                             {getElevatorStatusStr(elevator)}
                         </div>
+                        <button className="call-button" onClick={() => callElevator(i, "up", null)}>⬆️</button>
+                        <button className="call-button" onClick={() => callElevator(i, "down", null)}>⬇️</button>
                         <div className="call-buttons">
                             {
                                 (
                                     <div className="floor-selection">
-                                        {Array.from({ length: numFloors }, (_, index) => numFloors - index).map(floor => {
+                                        {elevatorButtonOrders.map(floor => {
                                             return (
                                                 <button
                                                     key={floor}
@@ -111,8 +114,6 @@ const App = () => {
                                         })}
                                     </div>
                                 )}
-                            <button className="call-button" onClick={() => callElevator(i, "up", null)}>⬆️</button>
-                            <button className="call-button" onClick={() => callElevator(i, "down", null)}>⬇️</button>
                             <button
                                 className="call-button"
                                 onClick={() => openDoor(i, elevatorId)}
